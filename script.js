@@ -43,6 +43,7 @@ function renderCollection() {
                 <h3>${tape.title}</h3>
                 <p>Студия: ${tape.studio || '—'}</p>
                 <p>Год: ${tape.year || '—'}</p>
+                <p>Локализация: ${tape.localization || '—'}</p>
                 <p>Состояние: ${tape.condition}</p>
                 <button onclick="deleteTape(${index})">Удалить</button>
             </div>
