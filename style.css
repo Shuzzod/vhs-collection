@@ -18,6 +18,7 @@ form {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    align-items: center;
 }
 
 form input, form select, form button {
@@ -26,11 +27,45 @@ form input, form select, form button {
     border-radius: 4px;
 }
 
-form button {
+form button[type="submit"] {
     background: #333;
     color: white;
     cursor: pointer;
     border: none;
+}
+
+#addStudioBtn {
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #333;
+}
+
+#addStudioBtn:hover {
+    background: #f0f0f0;
+}
+
+.io-buttons {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.io-buttons button, .import-label {
+    padding: 8px 12px;
+    background: #e63946;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.import-label {
+    display: inline-block;
 }
 
 .tape-card {
@@ -39,34 +74,6 @@ form button {
     margin-bottom: 10px;
     border-radius: 8px;
     border-left: 4px solid #e63946;
-}
-
-.tape-card h3 {
-    margin-top: 0;
-    color: #e63946;
-}
-
-.tape-card button {
-    background: #ddd;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.io-buttons {
-    margin-bottom: 15px;
-    display: flex;
-    gap: 10px;
-}
-.io-buttons button, .import-label {
-    padding: 8px 12px;
-    background: #e63946;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.tape-card {
     display: flex;
     gap: 15px;
     align-items: flex-start;
@@ -86,7 +93,7 @@ form button {
     align-items: center;
     justify-content: center;
     font-size: 11px;
-    color: #888;
+    color: #000;
     text-align: center;
     border: 1px dashed #bbb;
 }
@@ -97,4 +104,57 @@ form button {
 
 .tape-info h3 {
     margin: 0 0 8px 0;
+    color: #e63946;
+}
+
+.tape-info p {
+    margin: 4px 0;
+}
+
+.tape-info button {
+    background: #ddd;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+.card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.edit-btn, .save-btn {
+    background: #2a6fdb;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.delete-btn, .cancel-btn {
+    background: #ddd;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tape-card.editing {
+    border-left-color: #2a6fdb;
+    background: #f0f5ff;
+}
+
+.tape-card.editing input,
+.tape-card.editing select {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
