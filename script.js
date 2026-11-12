@@ -252,7 +252,7 @@ async function saveEdit(index) {
     const yearInput = document.getElementById(`edit-year-${index}`).value;
     const yearCheck = validateYear(yearInput);
     if (!yearCheck.ok) {
-        showError('Год должен быть 4 цифры (1997) или диапазон (1997-1998)');
+        showError('Год должен быть 4 цифры или диапазон (1997-1998)');
         return;
     }
 
@@ -297,7 +297,7 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
     const yearInput = document.getElementById('year').value;
     const yearCheck = validateYear(yearInput);
     if (!yearCheck.ok) {
-        showError('Год должен быть 4 цифры (1997) или диапазон (1997-1998)');
+        showError('Год должен быть 4 цифры или диапазон (1997-1998)');
         return;
     }
 
