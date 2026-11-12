@@ -18,27 +18,48 @@
     </div>
 
     <form id="addForm">
-        <input type="text" id="title" placeholder="Название" required>
+        <input type="text" id="title" placeholder="Название фильма" required>
 
-        <input list="studiosList" id="studio" placeholder="Студия">
+        <input list="studiosList" id="studio" placeholder="Студия (выберите или введите)">
         <datalist id="studiosList"></datalist>
 
-        <input list="localizationsList" id="localization" placeholder="Локализация">
+        <input list="localizationsList" id="localization" placeholder="Локализация (выберите или введите)">
         <datalist id="localizationsList"></datalist>
 
-        <input type="text" id="year" placeholder="Год" inputmode="numeric" maxlength="10">
+        <input type="text" id="year" placeholder="Год (например, 1997)" inputmode="numeric" maxlength="10">
 
         <select id="condition">
             <option value="Запечатана">Запечатана</option>
             <option value="Отличное">Отличное</option>
             <option value="Хорошее">Хорошее</option>
             <option value="Удовлетворительное">Удовлетворительное</option>
-            <option value="Плохое">Плохое</option>
+            <option value="Плохое">Панель</option>
         </select>
 
         <input type="file" id="cover" accept="image/*">
         <button type="submit">Добавить кассету</button>
     </form>
+
+    <!-- Панель поиска и сортировки -->
+    <div id="controls">
+        <input type="text" id="searchInput" placeholder="Поиск по названию, студии, локализации...">
+        <select id="filterStudio">
+            <option value="">Все студии</option>
+        </select>
+        <select id="filterLocalization">
+            <option value="">Все локализации</option>
+        </select>
+        <select id="sortSelect">
+            <option value="added-desc">Сначала новые добавленные</option>
+            <option value="added-asc">Сначала старые добавленные</option>
+            <option value="title-asc">Название А–Я</option>
+            <option value="title-desc">Название Я–А</option>
+            <option value="year-desc">Год: сначала новые</option>
+            <option value="year-asc">Год: сначала старые</option>
+        </select>
+        <button type="button" id="resetFilters" class="reset-btn">Сбросить фильтры</button>
+        <span id="counter"></span>
+    </div>
 
     <div id="collection"></div>
 
