@@ -49,3 +49,35 @@ function deleteTape(index) {
 
 // Первая отрисовка при загрузке
 renderCollection();
+function exportCollection() {
+    const dataStr = JSON.stringify(tapes, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vhs-collection.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importCollection(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const imported = JSON.parse(e.target.result);
+            if (Array.isArray(imported)) {
+                tapes = imported;
+                localStorage.setItem('vhsTapes', JSON.stringify(tapes));
+                renderCollection();
+                alert('Коллекция загружена: ' + tapes.length + ' кассет');
+            } else {
+                alert('Неверный формат файла');
+            }
+        } catch (err) {
+            alert('Ошибка чтения файла: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
