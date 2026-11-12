@@ -6,6 +6,13 @@
     <title>VHS коллекция</title>
     <link rel="stylesheet" href="style.css">
 </head>
+<div class="io-buttons">
+    <button onclick="exportCollection()">Скачать коллекцию (JSON)</button>
+    <label class="import-label">
+        Загрузить коллекцию
+        <input type="file" id="importFile" accept=".json" onchange="importCollection(event)" hidden>
+    </label>
+</div>
 <body>
     <h1>VHS коллекция</h1>
     
