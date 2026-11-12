@@ -10,7 +10,7 @@ h1 {
     color: #333;
 }
 
-/* Форма добавления */
+/* ===== Форма добавления ===== */
 form {
     background: white;
     padding: 15px;
@@ -27,6 +27,7 @@ form input, form select, form button {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
+    box-sizing: border-box;
 }
 
 form button[type="submit"] {
@@ -50,7 +51,7 @@ input[list] {
     padding-right: 25px;
 }
 
-/* Кнопки экспорта/импорта */
+/* ===== Кнопки экспорта/импорта ===== */
 .io-buttons {
     margin-bottom: 15px;
     display: flex;
@@ -76,7 +77,62 @@ input[list] {
     display: inline-block;
 }
 
-/* Карточка кассеты */
+/* ===== Панель поиска и сортировки ===== */
+#controls {
+    background: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+#controls input,
+#controls select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    height: 38px;
+    box-sizing: border-box;
+}
+
+#searchInput {
+    flex: 0 0 auto;
+    width: 220px;
+    min-width: 0;
+    height: 38px;
+    min-height: 38px;
+    max-height: 38px;
+    box-sizing: border-box;
+}
+
+#counter {
+    font-size: 13px;
+    color: #666;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.reset-btn {
+    padding: 8px 12px;
+    background: #fff;
+    color: #000;
+    border: 1px solid #888;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    height: 38px;
+    box-sizing: border-box;
+}
+
+.reset-btn:hover {
+    background: #f0f0f0;
+}
+
+/* ===== Карточка кассеты ===== */
 .tape-card {
     background: white;
     padding: 15px;
@@ -120,7 +176,7 @@ input[list] {
     margin: 4px 0;
 }
 
-/* Кнопки в карточке */
+/* ===== Кнопки в карточке ===== */
 .card-actions {
     display: flex;
     gap: 8px;
@@ -157,7 +213,7 @@ input[list] {
     color: #fff;
 }
 
-/* Режим редактирования */
+/* ===== Режим редактирования ===== */
 .tape-card.editing {
     border-left-color: #2a6fdb;
     background: #f0f5ff;
@@ -201,6 +257,7 @@ input[list] {
 .tape-card.editing .cancel-btn:hover {
     background: #c5c5c5;
 }
+
 /* ===== Модальные окна ===== */
 .modal-overlay {
     position: fixed;
@@ -299,58 +356,75 @@ input[list] {
 .modal-btn.danger:hover {
     background: #a00;
 }
-/* ===== Панель поиска и сортировки ===== */
-#controls {
-    background: #fff;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
 
-#controls input,
-#controls select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-#searchInput {
-    flex: 1 1 220px;
-    min-width: 180px;
-}
-
-#counter {
-    font-size: 13px;
-    color: #666;
-    margin-left: auto;
-    white-space: nowrap;
-}
-
+/* ===== Мобильная адаптация ===== */
 @media (max-width: 600px) {
-    #controls {
-        flex-direction: column;
-        align-items: stretch;
+    body {
+        padding: 12px;
     }
-    #counter {
-        margin-left: 0;
-        text-align: right;
-    }
-}
-.reset-btn {
-    padding: 8px 12px;
-    background: #fff;
-    color: #000;
-    border: 1px solid #888;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
 
-.reset-btn:hover {
-    background: #f0f0f0;
+    form {
+        padding: 10px;
+        gap: 6px;
+    }
+
+    form input, form select, form button {
+        padding: 6px;
+        font-size: 14px;
+        height: 36px;
+        box-sizing: border-box;
+    }
+
+    #controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 8px;
+        gap: 6px;
+    }
+
+    #searchInput {
+        flex: 0 0 100%;
+        width: 100%;
+        height: 38px;
+        min-height: 38px;
+        max-height: 38px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    #controls select,
+    #controls .reset-btn {
+        flex: 1 1 calc(50% - 3px);
+        min-width: 0;
+        height: 36px;
+        font-size: 13px;
+        box-sizing: border-box;
+    }
+
+    #counter {
+        flex: 1 1 100%;
+        text-align: right;
+        font-size: 12px;
+        margin-left: 0;
+    }
+
+    .tape-card {
+        flex-direction: row;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .tape-cover {
+        width: 80px;
+        height: 112px;
+    }
+
+    .tape-info h3 {
+        font-size: 16px;
+    }
+
+    .tape-info p {
+        font-size: 13px;
+    }
 }

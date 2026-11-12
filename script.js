@@ -1,6 +1,8 @@
 let tapes = JSON.parse(localStorage.getItem('vhsTapes')) || [];
 let editingIndex = null;
 
+const CONDITIONS = ['Запечатана', 'Отличное', 'Хорошее', 'Удовлетворительное', 'Плохое'];
+
 const DEFAULT_STUDIOS = [
     'Varus Video', 'Most Video', 'Premier Video Film', 'Крупный план',
     'Лазер Видео', 'Союз Видео', 'West Video', 'EA Cinema', 'Екатеринбург Арт',
@@ -9,18 +11,15 @@ const DEFAULT_STUDIOS = [
 ];
 
 const DEFAULT_LOCALIZATIONS = [
-    'Одноголосый',
-    'Двухголосый',
-    'Многоголосый',
-    'Дубляж',
-    'Субтитры',
-    'Оригинал',
-    'Пиратский перевод',
-    'Другая'
+    'Одноголосый', 'Двухголосый', 'Многоголосый', 'Дубляж',
+    'Субтитры', 'Оригинал', 'Пиратский перевод', 'Другая'
 ];
 
 let studios = JSON.parse(localStorage.getItem('vhsStudios')) || [...DEFAULT_STUDIOS];
 let localizations = JSON.parse(localStorage.getItem('vhsLocalizations')) || [...DEFAULT_LOCALIZATIONS];
+
+// Миграция старых данных без addedAt
+tapes = tapes.map((t, i) => ({ ...t, addedAt: t.addedAt || Date.now() + i }));
 
 function saveStudios() {
     localStorage.setItem('vhsStudios', JSON.stringify(studios));
@@ -83,6 +82,7 @@ function rememberValue(value, list, saveFn) {
         list.push(trimmed);
         saveFn();
         renderDatalists();
+        renderFilters();
     }
 }
 
@@ -95,7 +95,6 @@ function renderFilters() {
     const currentStudio = studioFilter.value;
     const currentLoc = locFilter.value;
 
-    // Собираем уникальные значения из коллекции + базовые списки
     const usedStudios = [...new Set(tapes.map(t => t.studio).filter(Boolean))];
     const usedLocs = [...new Set(tapes.map(t => t.localization).filter(Boolean))];
 
@@ -116,7 +115,6 @@ function getFilteredTapes() {
     const locFilter = document.getElementById('filterLocalization').value;
     const sort = document.getElementById('sortSelect').value;
 
-    // Оставляем исходный индекс для кнопок
     let result = tapes.map((tape, index) => ({ tape, index }));
 
     if (search) {
@@ -134,7 +132,6 @@ function getFilteredTapes() {
         result = result.filter(({ tape }) => (tape.localization || '') === locFilter);
     }
 
-    // Сортировка
     result.sort((a, b) => {
         const ta = a.tape, tb = b.tape;
         switch (sort) {
@@ -223,7 +220,7 @@ function renderEditCard(tape, index) {
             <input type="text" id="edit-year-${index}" value="${escapeAttr(tape.year)}" placeholder="Год" inputmode="numeric">
 
             <select id="edit-condition-${index}">
-                ${['Запечатана','Отличное','Хорошее','Потёртости'].map(c =>
+                ${CONDITIONS.map(c =>
                     `<option value="${c}"${c === tape.condition ? ' selected' : ''}>${c}</option>`
                 ).join('')}
             </select>
@@ -286,7 +283,6 @@ async function saveEdit(index) {
     localStorage.setItem('vhsTapes', JSON.stringify(tapes));
     editingIndex = null;
     renderFilters();
-    renderDatalists();
     renderCollection();
 }
 
@@ -332,7 +328,6 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
     localStorage.setItem('vhsTapes', JSON.stringify(tapes));
 
     document.getElementById('addForm').reset();
-    renderDatalists();
     renderFilters();
     renderCollection();
 });
@@ -341,8 +336,12 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
 function deleteTape(index) {
     const tape = tapes[index];
     showConfirm(tape ? tape.title : '', () => {
-        if (editingIndex === index) editingIndex = null;
         tapes.splice(index, 1);
+        // Если редактировали элемент с большим индексом — сдвигаем; если этот — сбрасываем
+        if (editingIndex !== null) {
+            if (editingIndex === index) editingIndex = null;
+            else if (editingIndex > index) editingIndex -= 1;
+        }
         localStorage.setItem('vhsTapes', JSON.stringify(tapes));
         renderFilters();
         renderCollection();
@@ -369,7 +368,6 @@ function importCollection(event) {
         try {
             const imported = JSON.parse(e.target.result);
             if (Array.isArray(imported)) {
-                // На случай старых файлов без addedAt
                 tapes = imported.map((t, i) => ({ ...t, addedAt: t.addedAt || Date.now() + i }));
                 localStorage.setItem('vhsTapes', JSON.stringify(tapes));
                 editingIndex = null;
@@ -407,10 +405,10 @@ function compressImage(file, maxWidth = 300, maxHeight = 400) {
                 ctx.drawImage(img, 0, 0, width, height);
                 resolve(canvas.toDataURL('image/jpeg', 0.7));
             };
-            img.onerror = reject;
+            img.onerror = () => reject(new Error('Не удалось прочитать изображение'));
             img.src = e.target.result;
         };
-        reader.onerror = reject;
+        reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
         reader.readAsDataURL(file);
     });
 }
@@ -431,7 +429,8 @@ function escapeHtml(str) {
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 function escapeAttr(str) {
