@@ -10,6 +10,7 @@ h1 {
     color: #333;
 }
 
+/* Форма добавления */
 form {
     background: white;
     padding: 15px;
@@ -25,6 +26,7 @@ form input, form select, form button {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 14px;
 }
 
 form button[type="submit"] {
@@ -34,19 +36,21 @@ form button[type="submit"] {
     border: none;
 }
 
-#addStudioBtn {
-    padding: 8px;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #333;
+form button[type="submit"]:hover {
+    background: #555;
 }
 
-#addStudioBtn:hover {
-    background: #f0f0f0;
+/* Поля с datalist — лёгкий намёк на выпадающий список */
+input[list] {
+    background-image: linear-gradient(45deg, transparent 50%, #888 50%),
+                      linear-gradient(135deg, #888 50%, transparent 50%);
+    background-position: calc(100% - 15px) center, calc(100% - 10px) center;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 25px;
 }
 
+/* Кнопки экспорта/импорта */
 .io-buttons {
     margin-bottom: 15px;
     display: flex;
@@ -64,10 +68,15 @@ form button[type="submit"] {
     font-size: 14px;
 }
 
+.io-buttons button:hover, .import-label:hover {
+    background: #c92f3b;
+}
+
 .import-label {
     display: inline-block;
 }
 
+/* Карточка кассеты */
 .tape-card {
     background: white;
     padding: 15px;
@@ -93,7 +102,7 @@ form button[type="submit"] {
     align-items: center;
     justify-content: center;
     font-size: 11px;
-    color: #000;
+    color: #888;
     text-align: center;
     border: 1px dashed #bbb;
 }
@@ -111,39 +120,44 @@ form button[type="submit"] {
     margin: 4px 0;
 }
 
-.tape-info button {
-    background: #ddd;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 8px;
-}
+/* Кнопки в карточке */
 .card-actions {
     display: flex;
     gap: 8px;
     margin-top: 10px;
 }
 
-.edit-btn, .save-btn {
+.tape-info .edit-btn {
+    background: #fff;
+    color: #000;
+    border: 1px solid #2a6fdb;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tape-info .edit-btn:hover {
     background: #2a6fdb;
+    color: #fff;
+}
+
+.tape-info .delete-btn {
+    background: #fff;
     color: #000;
-    border: none;
+    border: 1px solid #c00;
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: 600;
+    font-size: 14px;
 }
 
-.delete-btn, .cancel-btn {
-    background: #ddd;
-    color: #000;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
+.tape-info .delete-btn:hover {
+    background: #c00;
+    color: #fff;
 }
 
+/* Режим редактирования */
 .tape-card.editing {
     border-left-color: #2a6fdb;
     background: #f0f5ff;
@@ -154,7 +168,134 @@ form button[type="submit"] {
     width: 100%;
     margin-bottom: 8px;
     padding: 8px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 14px;
+}
+
+.tape-card.editing .save-btn {
+    background: #2a6fdb;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tape-card.editing .save-btn:hover {
+    background: #1f57b0;
+}
+
+.tape-card.editing .cancel-btn {
+    background: #ddd;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tape-card.editing .cancel-btn:hover {
+    background: #c5c5c5;
+}
+/* ===== Модальные окна ===== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px 22px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.modal-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #c00;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.modal-subtitle {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+.modal-title-large {
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 12px;
+}
+
+.modal-text {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 18px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #f0f0f0;
+    color: #000;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.modal-btn:hover {
+    background: #e0e0e0;
+}
+
+.modal-btn.primary {
+    background: #2a6fdb;
+    border-color: #2a6fdb;
+    color: #fff;
+}
+
+.modal-btn.primary:hover {
+    background: #1f57b0;
+}
+
+.modal-btn.danger {
+    background: #c00;
+    border-color: #c00;
+    color: #fff;
+}
+
+.modal-btn.danger:hover {
+    background: #a00;
 }

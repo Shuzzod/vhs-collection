@@ -18,27 +18,53 @@
     </div>
 
     <form id="addForm">
-        <input type="text" id="title" placeholder="Название фильма" required>
-        <select id="studio">
-            <option value="">— Выберите студию —</option>
-        </select>
-        <button type="button" id="addStudioBtn">+ Новая студия</button>
-        <select id="localization">
-            <option value="">— Локализация —</option>
-        </select>
-        <button type="button" id="addLocalizationBtn">+ Своя</button>
+        <input type="text" id="title" placeholder="Название" required>
+
+        <input list="studiosList" id="studio" placeholder="Студия">
+        <datalist id="studiosList"></datalist>
+
+        <input list="localizationsList" id="localization" placeholder="Локализация">
+        <datalist id="localizationsList"></datalist>
+
         <input type="text" id="year" placeholder="Год" inputmode="numeric" maxlength="10">
+
         <select id="condition">
             <option value="Запечатана">Запечатана</option>
             <option value="Отличное">Отличное</option>
             <option value="Хорошее">Хорошее</option>
-            <option value="Потёртости">Потёртости</option>
+            <option value="Удовлетворительное">Удовлетворительное</option>
+            <option value="Плохое">Плохое</option>
         </select>
+
         <input type="file" id="cover" accept="image/*">
         <button type="submit">Добавить кассету</button>
     </form>
 
     <div id="collection"></div>
+
+    <!-- Модальное окно ошибки -->
+    <div id="errorModal" class="modal-overlay" hidden>
+        <div class="modal">
+            <div class="modal-title">Ошибка</div>
+            <div class="modal-text" id="errorText"></div>
+            <div class="modal-actions">
+                <button class="modal-btn primary" onclick="closeError()">Понятно</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения -->
+    <div id="confirmModal" class="modal-overlay" hidden>
+        <div class="modal">
+            <div class="modal-subtitle">Подтверждение удаления</div>
+            <div class="modal-title-large">Удалить кассету?</div>
+            <div class="modal-text" id="confirmText"></div>
+            <div class="modal-actions">
+                <button class="modal-btn" onclick="closeConfirm()">Отмена</button>
+                <button class="modal-btn danger" id="confirmOkBtn">Подтвердить</button>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
