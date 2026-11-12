@@ -1,54 +1,91 @@
-// Массив для хранения кассет
 let tapes = JSON.parse(localStorage.getItem('vhsTapes')) || [];
 
-// Функция отрисовки коллекции
+// Сжатие фото до 300x400 и качества 0.7
+function compressImage(file, maxWidth = 300, maxHeight = 400) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                let { width, height } = img;
+                if (width > maxWidth || height > maxHeight) {
+                    const ratio = Math.min(maxWidth / width, maxHeight / height);
+                    width = Math.round(width * ratio);
+                    height = Math.round(height * ratio);
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
 function renderCollection() {
     const container = document.getElementById('collection');
     if (tapes.length === 0) {
         container.innerHTML = '<p>Пока пусто. Добавьте первую кассету.</p>';
         return;
     }
-    
     container.innerHTML = tapes.map((tape, index) => `
         <div class="tape-card">
-            <h3>${tape.title}</h3>
-            <p>Студия: ${tape.studio || '—'}</p>
-            <p>Год: ${tape.year || '—'}</p>
-            <p>Состояние: ${tape.condition}</p>
-            <button onclick="deleteTape(${index})">Удалить</button>
+            ${tape.cover 
+                ? `<img src="${tape.cover}" alt="${tape.title}" class="tape-cover">` 
+                : `<div class="tape-cover tape-cover-empty">Нет фото</div>`}
+            <div class="tape-info">
+                <h3>${tape.title}</h3>
+                <p>Студия: ${tape.studio || '—'}</p>
+                <p>Год: ${tape.year || '—'}</p>
+                <p>Состояние: ${tape.condition}</p>
+                <button onclick="deleteTape(${index})">Удалить</button>
+            </div>
         </div>
     `).join('');
 }
 
-// Добавление кассеты
-document.getElementById('addForm').addEventListener('submit', (e) => {
+document.getElementById('addForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    let coverData = '';
+    const coverInput = document.getElementById('cover');
+    if (coverInput.files && coverInput.files[0]) {
+        try {
+            coverData = await compressImage(coverInput.files[0]);
+        } catch (err) {
+            alert('Не удалось обработать фото: ' + err.message);
+            return;
+        }
+    }
     
     const tape = {
         title: document.getElementById('title').value,
         studio: document.getElementById('studio').value,
         year: document.getElementById('year').value,
-        condition: document.getElementById('condition').value
+        condition: document.getElementById('condition').value,
+        cover: coverData
     };
     
     tapes.push(tape);
     localStorage.setItem('vhsTapes', JSON.stringify(tapes));
     
-    // Очищаем форму
     document.getElementById('addForm').reset();
-    
     renderCollection();
 });
 
-// Удаление кассеты
 function deleteTape(index) {
+    if (!confirm('Удалить кассету?')) return;
     tapes.splice(index, 1);
     localStorage.setItem('vhsTapes', JSON.stringify(tapes));
     renderCollection();
 }
 
-// Первая отрисовка при загрузке
-renderCollection();
 function exportCollection() {
     const dataStr = JSON.stringify(tapes, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
@@ -81,3 +118,5 @@ function importCollection(event) {
     };
     reader.readAsText(file);
 }
+
+renderCollection();
