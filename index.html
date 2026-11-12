@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VHS коллекция</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>VHS коллекция</h1>
+    
+    <form id="addForm">
+        <input type="text" id="title" placeholder="Название фильма" required>
+        <input type="text" id="studio" placeholder="Студия">
+        <input type="number" id="year" placeholder="Год релиза">
+        <select id="condition">
+            <option value="Запечатана">Запечатана</option>
+            <option value="Отличное">Отличное</option>
+            <option value="Хорошее">Хорошее</option>
+            <option value="Потёртости">Потёртости</option>
+        </select>
+        <button type="submit">Добавить кассету</button>
+    </form>
+
+    <div id="collection"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
