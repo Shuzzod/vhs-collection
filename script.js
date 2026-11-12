@@ -2,11 +2,6 @@ let tapes = JSON.parse(localStorage.getItem('vhsTapes')) || [];
 let editingIndex = null;
 
 const DEFAULT_STUDIOS = [
-    'Союз Видео', 'Варус Видео', 'Мастер Тэйп', 'Most Video',
-    'West Video', 'Студия Горького', 'Крупный План', 'Другая'
-];
-
-const DEFAULT_STUDIOS = [
     // Крупные и самые известные
     'Varus Video',
     'Most Video',
@@ -28,6 +23,17 @@ const DEFAULT_STUDIOS = [
     'Техновидео',
     
     // Запасной вариант
+    'Другая'
+];
+
+const DEFAULT_LOCALIZATIONS = [
+    'Одноголосый',
+    'Двухголосый',
+    'Многоголосый',
+    'Дубляж',
+    'Субтитры',
+    'Оригинал',
+    'Пиратский перевод',
     'Другая'
 ];
 
