@@ -1,430 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;1,700&family=Caveat:wght@600&display=swap');
+
+/* ===== Базовое ===== */
+* { box-sizing: border-box; }
+
 body {
-    font-family: Arial, sans-serif;
-    max-width: 800px;
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 850px;
     margin: 0 auto;
     padding: 20px;
-    background: #f5f5f5;
+    background-color: #F4EFE6;
+    background-image: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 3px);
+    color: #1A1A1A;
 }
 
-h1 {
-    color: #333;
-}
+/* ===== Шапка (без изменений) ===== */
+.vhs-header { margin: -20px -20px 20px -20px; padding: 18px 20px; background: #1a1a1a; border-bottom: 4px solid #0d0d0d; }
+.vhs-spine { display: flex; align-items: stretch; gap: 12px; background: #222; border: 2px solid #0d0d0d; border-radius: 4px; padding: 10px; box-shadow: inset 0 0 0 1px #3a3a3a; }
+.vhs-spine-label { flex: 1; background: #f0ece0; border: 1px solid #b8b2a0; border-radius: 2px; padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; position: relative; box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.08); }
+.vhs-spine-label::before { content: ""; position: absolute; top: 4px; left: 8px; right: 8px; height: 2px; background: #c0392b; opacity: 0.7; }
+.vhs-spine-title { font-family: Arial, Helvetica, sans-serif; font-weight: 400; font-size: 24px; letter-spacing: 0.04em; line-height: 1; color: #1a1a1a; margin-top: 4px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.vhs-logo-img { height: 28px; width: auto; flex-shrink: 0; display: block; }
+.vhs-spine-sub { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 0.08em; color: #5a5647; margin-top: 6px; }
+.vhs-spine-holes { display: flex; flex-direction: column; justify-content: space-between; padding: 4px 2px; }
+.vhs-spine-holes span { width: 14px; height: 14px; border-radius: 50%; background: #0d0d0d; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), 0 0 0 2px #2a2a2a; }
+
+/* ===== Кнопки экспорта ===== */
+.io-buttons { margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+.io-buttons button, .import-label { padding: 10px 16px; background: #E05A33; color: #FFF; border: 2px solid #1A1A1A; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 3px 3px 0 #1A1A1A; transition: transform 0.1s, box-shadow 0.1s; }
+.io-buttons button:hover, .import-label:hover { background: #C74A25; }
+.io-buttons button:active, .import-label:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #1A1A1A; }
+.import-label { display: inline-block; }
 
 /* ===== Форма добавления ===== */
-form {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
+form#addForm { background: #FFFDF6; padding: 20px; border: 2px solid #1A1A1A; border-radius: 6px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; box-shadow: 4px 4px 0 #1A1A1A; }
+#addForm input, #addForm select, #addForm button { padding: 10px; border: 2px solid #1A1A1A; border-radius: 4px; font-size: 14px; background: #FFF; color: #1A1A1A; box-sizing: border-box; font-family: inherit; }
+#addForm input:focus, #addForm select:focus { outline: none; box-shadow: inset 0 0 0 2px #00A8A8; }
+#addForm button[type="submit"] { background: #00A8A8; color: #FFF; cursor: pointer; border: 2px solid #1A1A1A; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; box-shadow: 2px 2px 0 #1A1A1A; transition: transform 0.1s, box-shadow 0.1s; }
+#addForm button[type="submit"]:hover { background: #008F8F; }
+#addForm button[type="submit"]:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1A1A1A; }
+input[list] { background-image: linear-gradient(45deg, transparent 50%, #1A1A1A 50%), linear-gradient(135deg, #1A1A1A 50%, transparent 50%); background-position: calc(100% - 15px) center, calc(100% - 10px) center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 25px; }
 
-form input, form select, form button {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-form button[type="submit"] {
-    background: #333;
-    color: white;
-    cursor: pointer;
-    border: none;
-}
-
-form button[type="submit"]:hover {
-    background: #555;
-}
-
-/* Поля с datalist — лёгкий намёк на выпадающий список */
-input[list] {
-    background-image: linear-gradient(45deg, transparent 50%, #888 50%),
-                      linear-gradient(135deg, #888 50%, transparent 50%);
-    background-position: calc(100% - 15px) center, calc(100% - 10px) center;
-    background-size: 5px 5px, 5px 5px;
-    background-repeat: no-repeat;
-    padding-right: 25px;
-}
-
-/* ===== Кнопки экспорта/импорта ===== */
-.io-buttons {
-    margin-bottom: 15px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.io-buttons button, .import-label {
-    padding: 8px 12px;
-    background: #e63946;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.io-buttons button:hover, .import-label:hover {
-    background: #c92f3b;
-}
-
-.import-label {
-    display: inline-block;
-}
-
-/* ===== Панель поиска и сортировки ===== */
-#controls {
-    background: #fff;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
-
-#controls input,
-#controls select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    height: 38px;
-    box-sizing: border-box;
-}
-
-#searchInput {
-    flex: 0 0 auto;
-    width: 220px;
-    min-width: 0;
-    height: 38px;
-    min-height: 38px;
-    max-height: 38px;
-    box-sizing: border-box;
-}
-
-#counter {
-    font-size: 13px;
-    color: #666;
-    margin-left: auto;
-    white-space: nowrap;
-}
-
-.reset-btn {
-    padding: 8px 12px;
-    background: #fff;
-    color: #000;
-    border: 1px solid #888;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    height: 38px;
-    box-sizing: border-box;
-}
-
-.reset-btn:hover {
-    background: #f0f0f0;
-}
+/* ===== Панель поиска ===== */
+#controls { background: #FFFDF6; background-image: linear-gradient(45deg, #e8e4db 25%, transparent 25%, transparent 75%, #e8e4db 75%, #e8e4db), linear-gradient(45deg, #e8e4db 25%, transparent 25%, transparent 75%, #e8e4db 75%, #e8e4db); background-size: 20px 20px; background-position: 0 0, 10px 10px; padding: 15px; border: 2px solid #1A1A1A; border-radius: 6px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; box-shadow: 4px 4px 0 #1A1A1A; }
+#controls input, #controls select { padding: 8px; border: 2px solid #1A1A1A; border-radius: 4px; font-size: 14px; height: 40px; box-sizing: border-box; background: #FFF; color: #1A1A1A; font-family: inherit; }
+#controls input:focus, #controls select:focus { outline: none; box-shadow: inset 0 0 0 2px #00A8A8; }
+#searchInput { flex: 1 1 200px; min-width: 0; height: 40px; }
+#counter { font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; color: #1A1A1A; margin-left: auto; white-space: nowrap; background: #FFF; padding: 4px 8px; border: 2px solid #1A1A1A; border-radius: 4px; }
+.reset-btn { padding: 8px 12px; background: #FFF; color: #1A1A1A; border: 2px solid #1A1A1A; border-radius: 4px; cursor: pointer; font-size: 13px; height: 40px; box-sizing: border-box; text-transform: uppercase; font-weight: bold; letter-spacing: 0.03em; box-shadow: 2px 2px 0 #1A1A1A; transition: transform 0.1s, box-shadow 0.1s; }
+.reset-btn:hover { background: #F0F0F0; }
+.reset-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1A1A1A; }
 
 /* ===== Карточка кассеты ===== */
-.tape-card {
-    background: white;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border-left: 4px solid #e63946;
-    display: flex;
-    gap: 15px;
-    align-items: flex-start;
-}
-
-.tape-cover {
-    width: 100px;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 4px;
-    flex-shrink: 0;
-    background: #e0e0e0;
-}
-
-.tape-cover-empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    color: #888;
-    text-align: center;
-    border: 1px dashed #bbb;
-}
-
-.tape-info {
-    flex: 1;
-}
-
-.tape-info h3 {
-    margin: 0 0 8px 0;
-    color: #e63946;
-}
-
-.tape-info p {
-    margin: 4px 0;
-}
+.tape-card { background: #FFFDF6; padding: 18px 18px 18px 30px; margin-bottom: 15px; border: 2px solid #1A1A1A; border-radius: 6px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 4px 4px 0 #1A1A1A; position: relative; overflow: hidden; transition: transform 0.2s; }
+.tape-card:hover { transform: translateY(-2px); }
+.tape-card::before { content: ""; position: absolute; top: 0; left: 0; bottom: 0; width: 14px; background: #E05A33; background-image: radial-gradient(circle, #FFFDF6 2px, transparent 2.5px); background-size: 14px 14px; background-position: center 4px; background-repeat: repeat-y; border-right: 2px solid #1A1A1A; }
+.tape-cover { width: 110px; height: 155px; object-fit: cover; border-radius: 2px; flex-shrink: 0; background: #E8E4DB; border: 4px solid #FFF; box-shadow: 2px 2px 0 #1A1A1A; }
+.tape-cover-empty { display: flex; align-items: center; justify-content: center; font-size: 11px; color: #1A1A1A; text-align: center; border: 2px dashed #1A1A1A; font-family: 'Courier New', monospace; background: #FFF; font-weight: bold; }
+.tape-info { flex: 1; }
+.tape-info h3 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 24px; letter-spacing: 0.02em; margin: 0 0 10px 0; color: #1A1A1A; background: #F4EFE6; display: inline-block; padding: 2px 8px; line-height: 1.2; border-left: 4px solid #E05A33; word-break: break-word; }
+.tape-info p { margin: 6px 0; font-size: 14px; color: #1A1A1A; line-height: 1.5; }
+.tape-info p strong { font-family: 'Courier New', monospace; font-size: 13px; color: #E05A33; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 4px; }
 
 /* ===== Кнопки в карточке ===== */
-.card-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
+.card-actions { display: flex; gap: 10px; margin-top: 15px; }
+.tape-info .edit-btn, .tape-info .delete-btn { background: #FFF; color: #1A1A1A; border: 2px solid #1A1A1A; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.03em; box-shadow: 2px 2px 0 #1A1A1A; transition: transform 0.1s, box-shadow 0.1s; }
+.tape-info .edit-btn:hover { background: #00A8A8; color: #FFF; }
+.tape-info .delete-btn:hover { background: #E05A33; color: #FFF; }
+.tape-info .edit-btn:active, .tape-info .delete-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1A1A1A; }
 
-.tape-info .edit-btn {
-    background: #fff;
-    color: #000;
-    border: 1px solid #2a6fdb;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.tape-info .edit-btn:hover {
-    background: #2a6fdb;
-    color: #fff;
-}
-
-.tape-info .delete-btn {
-    background: #fff;
-    color: #000;
-    border: 1px solid #c00;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.tape-info .delete-btn:hover {
-    background: #c00;
-    color: #fff;
-}
-
-/* ===== Режим редактирования ===== */
-.tape-card.editing {
-    border-left-color: #2a6fdb;
-    background: #f0f5ff;
-}
-
-.tape-card.editing input,
-.tape-card.editing select {
-    width: 100%;
-    margin-bottom: 8px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 14px;
-}
-
-.tape-card.editing .save-btn {
-    background: #2a6fdb;
-    color: #fff;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.tape-card.editing .save-btn:hover {
-    background: #1f57b0;
-}
-
-.tape-card.editing .cancel-btn {
-    background: #ddd;
-    color: #000;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.tape-card.editing .cancel-btn:hover {
-    background: #c5c5c5;
-}
+/* Пустое состояние */
+#collection > p { font-family: 'Caveat', cursive; font-size: 32px; text-align: center; color: #1A1A1A; margin: 40px 0; }
 
 /* ===== Модальные окна ===== */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
-    box-sizing: border-box;
-}
+.modal-overlay { position: fixed; inset: 0; background: rgba(26, 26, 26, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
+.modal-overlay[hidden] { display: none; }
+.modal { background: #FFFDF6; border: 2px solid #1A1A1A; border-radius: 6px; padding: 24px; max-width: 420px; width: 100%; box-shadow: 6px 6px 0 #1A1A1A; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #E05A33; margin-bottom: 12px; }
+.modal-subtitle { font-family: 'Courier New', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #5A5647; margin-bottom: 8px; }
+.modal-title-large { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1A1A1A; margin-bottom: 15px; }
+.modal-text { font-size: 15px; color: #1A1A1A; margin-bottom: 20px; line-height: 1.5; word-break: break-word; }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+.modal-btn { padding: 10px 18px; border-radius: 4px; border: 2px solid #1A1A1A; background: #FFF; color: #1A1A1A; cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase; box-shadow: 3px 3px 0 #1A1A1A; transition: transform 0.1s, box-shadow 0.1s; }
+.modal-btn:hover { background: #F0F0F0; }
+.modal-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #1A1A1A; }
+.modal-btn.primary { background: #00A8A8; color: #FFF; }
+.modal-btn.primary:hover { background: #008F8F; }
+.modal-btn.danger { background: #E05A33; color: #FFF; }
+.modal-btn.danger:hover { background: #C74A25; }
 
-.modal-overlay[hidden] {
-    display: none;
-}
-
-.modal {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px 22px;
-    max-width: 420px;
-    width: 100%;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
-.modal-title {
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #c00;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.modal-subtitle {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #888;
-    margin-bottom: 6px;
-}
-
-.modal-title-large {
-    font-size: 22px;
-    font-weight: 700;
-    color: #222;
-    margin-bottom: 12px;
-}
-
-.modal-text {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 18px;
-    line-height: 1.4;
-    word-break: break-word;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-}
-
-.modal-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: #f0f0f0;
-    color: #000;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.modal-btn:hover {
-    background: #e0e0e0;
-}
-
-.modal-btn.primary {
-    background: #2a6fdb;
-    border-color: #2a6fdb;
-    color: #fff;
-}
-
-.modal-btn.primary:hover {
-    background: #1f57b0;
-}
-
-.modal-btn.danger {
-    background: #c00;
-    border-color: #c00;
-    color: #fff;
-}
-
-.modal-btn.danger:hover {
-    background: #a00;
-}
+/* Поля внутри модального окна редактирования */
+#editForm input, #editForm select { width: 100%; padding: 10px; border: 2px solid #1A1A1A; border-radius: 4px; font-size: 14px; background: #FFF; color: #1A1A1A; box-sizing: border-box; font-family: inherit; }
+#editForm input:focus, #editForm select:focus { outline: none; box-shadow: inset 0 0 0 2px #00A8A8; }
 
 /* ===== Мобильная адаптация ===== */
 @media (max-width: 600px) {
-    body {
-        padding: 12px;
-    }
-
-    form {
-        padding: 10px;
-        gap: 6px;
-    }
-
-    form input, form select, form button {
-        padding: 6px;
-        font-size: 14px;
-        height: 36px;
-        box-sizing: border-box;
-    }
-
-    #controls {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-        padding: 8px;
-        gap: 6px;
-    }
-
-    #searchInput {
-        flex: 0 0 100%;
-        width: 100%;
-        height: 38px;
-        min-height: 38px;
-        max-height: 38px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-
-    #controls select,
-    #controls .reset-btn {
-        flex: 1 1 calc(50% - 3px);
-        min-width: 0;
-        height: 36px;
-        font-size: 13px;
-        box-sizing: border-box;
-    }
-
-    #counter {
-        flex: 1 1 100%;
-        text-align: right;
-        font-size: 12px;
-        margin-left: 0;
-    }
-
-    .tape-card {
-        flex-direction: row;
-        padding: 10px;
-        gap: 10px;
-    }
-
-    .tape-cover {
-        width: 80px;
-        height: 112px;
-    }
-
-    .tape-info h3 {
-        font-size: 16px;
-    }
-
-    .tape-info p {
-        font-size: 13px;
-    }
+    body { padding: 12px; }
+    .vhs-header { margin: -12px -12px 15px -12px; padding: 12px; }
+    .vhs-spine-title { font-size: 19px; gap: 6px; }
+    .vhs-logo-img { height: 22px; }
+    .vhs-spine-sub { display: none; }
+    
+    form#addForm { padding: 12px; gap: 8px; box-shadow: 2px 2px 0 #1A1A1A; }
+    #addForm input, #addForm select, #addForm button { padding: 8px; font-size: 14px; height: 40px; }
+    
+    #controls { flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px; gap: 8px; box-shadow: 2px 2px 0 #1A1A1A; }
+    #searchInput { flex: 0 0 100%; width: 100%; height: 40px; font-size: 14px; }
+    #controls select { flex: 1 1 calc(50% - 4px); min-width: 0; height: 40px; font-size: 13px; }
+    .reset-btn { flex: 1 1 100%; width: 100%; height: 42px; font-size: 14px; line-height: 1.2; display: flex; align-items: center; justify-content: center; white-space: normal; text-align: center; }
+    #counter { flex: 1 1 100%; text-align: right; font-size: 13px; margin-left: 0; }
+    
+    .tape-card { flex-direction: row; padding: 12px 12px 12px 24px; gap: 12px; box-shadow: 2px 2px 0 #1A1A1A; }
+    .tape-card::before { width: 12px; background-size: 12px 12px; background-position: center 2px; }
+    .tape-cover { width: 85px; height: 120px; border-width: 3px; }
+    .tape-info h3 { font-size: 20px; padding: 2px 6px; margin-bottom: 8px; }
+    .tape-info p { font-size: 13px; margin: 4px 0; }
+    
+    .card-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; width: 100%; }
+    .tape-info .edit-btn, .tape-info .delete-btn { width: 100%; padding: 10px; font-size: 12px; box-sizing: border-box; text-align: center; display: flex; justify-content: center; align-items: center; }
 }

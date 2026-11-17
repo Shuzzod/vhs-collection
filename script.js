@@ -1,5 +1,5 @@
 let tapes = JSON.parse(localStorage.getItem('vhsTapes')) || [];
-let editingIndex = null;
+let editingIndex = null; // Индекс кассеты, которую сейчас редактируем
 
 const CONDITIONS = ['Запечатана', 'Отличное', 'Хорошее', 'Удовлетворительное', 'Плохое'];
 
@@ -15,18 +15,20 @@ const DEFAULT_LOCALIZATIONS = [
     'Субтитры', 'Оригинал', 'Пиратский перевод', 'Другая'
 ];
 
-let studios = JSON.parse(localStorage.getItem('vhsStudios')) || [...DEFAULT_STUDIOS];
-let localizations = JSON.parse(localStorage.getItem('vhsLocalizations')) || [...DEFAULT_LOCALIZATIONS];
+const savedStudios = JSON.parse(localStorage.getItem('vhsStudios')) || [];
+const savedLocalizations = JSON.parse(localStorage.getItem('vhsLocalizations')) || [];
 
-// Миграция старых данных без addedAt
+let studios = [...new Set([...DEFAULT_STUDIOS, ...savedStudios])];
+let localizations = [...new Set([...DEFAULT_LOCALIZATIONS, ...savedLocalizations])];
+
 tapes = tapes.map((t, i) => ({ ...t, addedAt: t.addedAt || Date.now() + i }));
 
-function saveStudios() {
-    localStorage.setItem('vhsStudios', JSON.stringify(studios));
-}
+function saveStudios() { localStorage.setItem('vhsStudios', JSON.stringify(studios)); }
+function saveLocalizations() { localStorage.setItem('vhsLocalizations', JSON.stringify(localizations)); }
 
-function saveLocalizations() {
-    localStorage.setItem('vhsLocalizations', JSON.stringify(localizations));
+function sortWithOtherLast(list) {
+    const OTHER = 'Другая';
+    return list.filter(item => item !== OTHER).sort((a, b) => a.localeCompare(b, 'ru')).concat(list.includes(OTHER) ? [OTHER] : []);
 }
 
 // ===== Модальные окна =====
@@ -34,45 +36,34 @@ function showError(message) {
     document.getElementById('errorText').textContent = message || '';
     document.getElementById('errorModal').hidden = false;
 }
-
-function closeError() {
-    document.getElementById('errorModal').hidden = true;
-}
+function closeError() { document.getElementById('errorModal').hidden = true; }
 
 let confirmCallback = null;
-
 function showConfirm(message, onConfirm) {
     document.getElementById('confirmText').textContent = message || '';
     confirmCallback = onConfirm;
     document.getElementById('confirmModal').hidden = false;
 }
-
 function closeConfirm() {
     confirmCallback = null;
     document.getElementById('confirmModal').hidden = true;
 }
-
 document.addEventListener('DOMContentLoaded', () => {
-    const okBtn = document.getElementById('confirmOkBtn');
-    if (okBtn) {
-        okBtn.addEventListener('click', () => {
-            const cb = confirmCallback;
-            closeConfirm();
-            if (typeof cb === 'function') cb();
-        });
-    }
+    document.getElementById('confirmOkBtn').addEventListener('click', () => {
+        const cb = confirmCallback;
+        closeConfirm();
+        if (typeof cb === 'function') cb();
+    });
 });
 
 // ===== Datalist =====
 function renderDatalists() {
-    const studiosList = document.getElementById('studiosList');
-    const localizationsList = document.getElementById('localizationsList');
-    if (studiosList) {
-        studiosList.innerHTML = studios.map(s => `<option value="${escapeAttr(s)}">`).join('');
-    }
-    if (localizationsList) {
-        localizationsList.innerHTML = localizations.map(l => `<option value="${escapeAttr(l)}">`).join('');
-    }
+    document.getElementById('studiosList').innerHTML = studios.map(s => `<option value="${escapeAttr(s)}">`).join('');
+    document.getElementById('localizationsList').innerHTML = localizations.map(l => `<option value="${escapeAttr(l)}">`).join('');
+    
+    // Для модалки редактирования
+    document.getElementById('editStudiosList').innerHTML = studios.map(s => `<option value="${escapeAttr(s)}">`).join('');
+    document.getElementById('editLocalizationsList').innerHTML = localizations.map(l => `<option value="${escapeAttr(l)}">`).join('');
 }
 
 function rememberValue(value, list, saveFn) {
@@ -98,14 +89,11 @@ function renderFilters() {
     const usedStudios = [...new Set(tapes.map(t => t.studio).filter(Boolean))];
     const usedLocs = [...new Set(tapes.map(t => t.localization).filter(Boolean))];
 
-    const allStudios = [...new Set([...usedStudios, ...studios])].sort();
-    const allLocs = [...new Set([...usedLocs, ...localizations])].sort();
+    const allStudios = sortWithOtherLast([...new Set([...studios, ...usedStudios])]);
+    const allLocs = sortWithOtherLast([...new Set([...localizations, ...usedLocs])]);
 
-    studioFilter.innerHTML = '<option value="">Все студии</option>' +
-        allStudios.map(s => `<option value="${escapeAttr(s)}"${s === currentStudio ? ' selected' : ''}>${escapeHtml(s)}</option>`).join('');
-
-    locFilter.innerHTML = '<option value="">Все локализации</option>' +
-        allLocs.map(l => `<option value="${escapeAttr(l)}"${l === currentLoc ? ' selected' : ''}>${escapeHtml(l)}</option>`).join('');
+    studioFilter.innerHTML = '<option value="">Все студии</option>' + allStudios.map(s => `<option value="${escapeAttr(s)}"${s === currentStudio ? ' selected' : ''}>${escapeHtml(s)}</option>`).join('');
+    locFilter.innerHTML = '<option value="">Все локализации</option>' + allLocs.map(l => `<option value="${escapeAttr(l)}"${l === currentLoc ? ' selected' : ''}>${escapeHtml(l)}</option>`).join('');
 }
 
 // ===== Фильтрация и сортировка =====
@@ -119,35 +107,23 @@ function getFilteredTapes() {
 
     if (search) {
         result = result.filter(({ tape }) => {
-            const haystack = [
-                tape.title, tape.studio, tape.localization, tape.year, tape.condition
-            ].filter(Boolean).join(' ').toLowerCase();
+            const haystack = [tape.title, tape.studio, tape.localization, tape.year, tape.condition].filter(Boolean).join(' ').toLowerCase();
             return haystack.includes(search);
         });
     }
-    if (studioFilter) {
-        result = result.filter(({ tape }) => (tape.studio || '') === studioFilter);
-    }
-    if (locFilter) {
-        result = result.filter(({ tape }) => (tape.localization || '') === locFilter);
-    }
+    if (studioFilter) result = result.filter(({ tape }) => (tape.studio || '') === studioFilter);
+    if (locFilter) result = result.filter(({ tape }) => (tape.localization || '') === locFilter);
 
     result.sort((a, b) => {
         const ta = a.tape, tb = b.tape;
         switch (sort) {
-            case 'title-asc':
-                return (ta.title || '').localeCompare(tb.title || '', 'ru');
-            case 'title-desc':
-                return (tb.title || '').localeCompare(ta.title || '', 'ru');
-            case 'year-asc':
-                return (parseInt(ta.year) || 0) - (parseInt(tb.year) || 0);
-            case 'year-desc':
-                return (parseInt(tb.year) || 0) - (parseInt(ta.year) || 0);
-            case 'added-asc':
-                return (ta.addedAt || 0) - (tb.addedAt || 0);
+            case 'title-asc': return (ta.title || '').localeCompare(tb.title || '', 'ru');
+            case 'title-desc': return (tb.title || '').localeCompare(ta.title || '', 'ru');
+            case 'year-asc': return (parseInt(ta.year) || 0) - (parseInt(tb.year) || 0);
+            case 'year-desc': return (parseInt(tb.year) || 0) - (parseInt(ta.year) || 0);
+            case 'added-asc': return (ta.addedAt || 0) - (tb.addedAt || 0);
             case 'added-desc':
-            default:
-                return (tb.addedAt || 0) - (ta.addedAt || 0);
+            default: return (tb.addedAt || 0) - (ta.addedAt || 0);
         }
     });
 
@@ -160,107 +136,72 @@ function renderCollection() {
     const counter = document.getElementById('counter');
     const filtered = getFilteredTapes();
 
-    if (counter) {
-        counter.textContent = filtered.length === tapes.length
-            ? `Всего: ${tapes.length}`
-            : `Показано ${filtered.length} из ${tapes.length}`;
-    }
+    if (counter) counter.textContent = filtered.length === tapes.length ? `Всего: ${tapes.length}` : `Показано ${filtered.length} из ${tapes.length}`;
 
     if (tapes.length === 0) {
         container.innerHTML = '<p>Пока пусто. Добавьте первую кассету.</p>';
         return;
     }
-
     if (filtered.length === 0) {
         container.innerHTML = '<p>Ничего не найдено. Попробуйте изменить поиск или фильтры.</p>';
         return;
     }
 
-    container.innerHTML = filtered.map(({ tape, index }) => {
-        if (editingIndex === index) {
-            return renderEditCard(tape, index);
-        }
-        return `
+    container.innerHTML = filtered.map(({ tape, index }) => `
         <div class="tape-card">
-            ${tape.cover
-                ? `<img src="${tape.cover}" alt="${escapeAttr(tape.title)}" class="tape-cover">`
-                : `<div class="tape-cover tape-cover-empty">Нет фото</div>`}
+            ${tape.cover ? `<img src="${tape.cover}" alt="${escapeAttr(tape.title)}" class="tape-cover">` : `<div class="tape-cover tape-cover-empty">Нет фото</div>`}
             <div class="tape-info">
                 <h3>${escapeHtml(tape.title)}</h3>
-                <p>Студия: ${escapeHtml(tape.studio) || '—'}</p>
-                <p>Локализация: ${escapeHtml(tape.localization) || '—'}</p>
-                <p>Год: ${escapeHtml(tape.year) || '—'}</p>
-                <p>Состояние: ${escapeHtml(tape.condition)}</p>
+                <p><strong>СТУДИЯ:</strong> ${escapeHtml(tape.studio) || '—'}</p>
+                <p><strong>ЛОКАЛИЗАЦИЯ:</strong> ${escapeHtml(tape.localization) || '—'}</p>
+                <p><strong>ГОД:</strong> ${escapeHtml(tape.year) || '—'}</p>
+                <p><strong>СОСТОЯНИЕ:</strong> ${escapeHtml(tape.condition)}</p>
                 <div class="card-actions">
                     <button class="edit-btn" onclick="startEdit(${index})">Редактировать</button>
                     <button class="delete-btn" onclick="deleteTape(${index})">Удалить</button>
                 </div>
             </div>
-        </div>`;
-    }).join('');
+        </div>`).join('');
 }
 
-function renderEditCard(tape, index) {
-    return `
-    <div class="tape-card editing">
-        <div class="tape-info" style="width:100%">
-            <h3>Редактирование</h3>
-            <input type="text" id="edit-title-${index}" value="${escapeAttr(tape.title)}" placeholder="Название">
-
-            <input list="editStudiosList-${index}" id="edit-studio-${index}" value="${escapeAttr(tape.studio)}" placeholder="Студия">
-            <datalist id="editStudiosList-${index}">
-                ${studios.map(s => `<option value="${escapeAttr(s)}">`).join('')}
-            </datalist>
-
-            <input list="editLocalizationsList-${index}" id="edit-localization-${index}" value="${escapeAttr(tape.localization)}" placeholder="Локализация">
-            <datalist id="editLocalizationsList-${index}">
-                ${localizations.map(l => `<option value="${escapeAttr(l)}">`).join('')}
-            </datalist>
-
-            <input type="text" id="edit-year-${index}" value="${escapeAttr(tape.year)}" placeholder="Год" inputmode="numeric">
-
-            <select id="edit-condition-${index}">
-                ${CONDITIONS.map(c =>
-                    `<option value="${c}"${c === tape.condition ? ' selected' : ''}>${c}</option>`
-                ).join('')}
-            </select>
-
-            <input type="file" id="edit-cover-${index}" accept="image/*">
-
-            <div class="card-actions">
-                <button class="save-btn" onclick="saveEdit(${index})">Сохранить</button>
-                <button class="cancel-btn" onclick="cancelEdit()">Отмена</button>
-            </div>
-        </div>
-    </div>`;
-}
-
+// ===== Редактирование (Модальное окно) =====
 function startEdit(index) {
     editingIndex = index;
-    renderCollection();
+    const tape = tapes[index];
+    
+    document.getElementById('edit-title').value = tape.title || '';
+    document.getElementById('edit-studio').value = tape.studio || '';
+    document.getElementById('edit-localization').value = tape.localization || '';
+    document.getElementById('edit-year').value = tape.year || '';
+    document.getElementById('edit-condition').value = tape.condition || 'Запечатана';
+    document.getElementById('edit-cover').value = ''; // Сбрасываем файл
+    
+    document.getElementById('editModal').hidden = false;
 }
 
-function cancelEdit() {
+function closeEdit() {
     editingIndex = null;
-    renderCollection();
+    document.getElementById('editModal').hidden = true;
 }
 
-async function saveEdit(index) {
-    const yearInput = document.getElementById(`edit-year-${index}`).value;
+async function saveEdit() {
+    if (editingIndex === null) return;
+    
+    const yearInput = document.getElementById('edit-year').value;
     const yearCheck = validateYear(yearInput);
     if (!yearCheck.ok) {
         showError('Год должен быть 4 цифры или диапазон (1997-1998)');
         return;
     }
 
-    const newStudio = document.getElementById(`edit-studio-${index}`).value;
-    const newLocalization = document.getElementById(`edit-localization-${index}`).value;
+    const newStudio = document.getElementById('edit-studio').value;
+    const newLocalization = document.getElementById('edit-localization').value;
 
     rememberValue(newStudio, studios, saveStudios);
     rememberValue(newLocalization, localizations, saveLocalizations);
 
-    const coverInput = document.getElementById(`edit-cover-${index}`);
-    let coverData = tapes[index].cover;
+    const coverInput = document.getElementById('edit-cover');
+    let coverData = tapes[editingIndex].cover;
     if (coverInput.files && coverInput.files[0]) {
         try {
             coverData = await compressImage(coverInput.files[0]);
@@ -270,18 +211,18 @@ async function saveEdit(index) {
         }
     }
 
-    tapes[index] = {
-        ...tapes[index],
-        title: document.getElementById(`edit-title-${index}`).value,
+    tapes[editingIndex] = {
+        ...tapes[editingIndex],
+        title: document.getElementById('edit-title').value,
         studio: newStudio.trim(),
         localization: newLocalization.trim(),
         year: yearCheck.value,
-        condition: document.getElementById(`edit-condition-${index}`).value,
+        condition: document.getElementById('edit-condition').value,
         cover: coverData
     };
 
     localStorage.setItem('vhsTapes', JSON.stringify(tapes));
-    editingIndex = null;
+    closeEdit();
     renderFilters();
     renderCollection();
 }
@@ -289,7 +230,6 @@ async function saveEdit(index) {
 // ===== Добавление =====
 document.getElementById('addForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const yearInput = document.getElementById('year').value;
     const yearCheck = validateYear(yearInput);
     if (!yearCheck.ok) {
@@ -299,7 +239,6 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
 
     const newStudio = document.getElementById('studio').value;
     const newLocalization = document.getElementById('localization').value;
-
     rememberValue(newStudio, studios, saveStudios);
     rememberValue(newLocalization, localizations, saveLocalizations);
 
@@ -314,7 +253,7 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
         }
     }
 
-    const tape = {
+    tapes.push({
         title: document.getElementById('title').value,
         studio: newStudio.trim(),
         localization: newLocalization.trim(),
@@ -322,11 +261,9 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
         condition: document.getElementById('condition').value,
         cover: coverData,
         addedAt: Date.now()
-    };
+    });
 
-    tapes.push(tape);
     localStorage.setItem('vhsTapes', JSON.stringify(tapes));
-
     document.getElementById('addForm').reset();
     renderFilters();
     renderCollection();
@@ -337,11 +274,9 @@ function deleteTape(index) {
     const tape = tapes[index];
     showConfirm(tape ? tape.title : '', () => {
         tapes.splice(index, 1);
-        // Если редактировали элемент с большим индексом — сдвигаем; если этот — сбрасываем
-        if (editingIndex !== null) {
-            if (editingIndex === index) editingIndex = null;
-            else if (editingIndex > index) editingIndex -= 1;
-        }
+        if (editingIndex === index) closeEdit();
+        else if (editingIndex !== null && editingIndex > index) editingIndex -= 1;
+        
         localStorage.setItem('vhsTapes', JSON.stringify(tapes));
         renderFilters();
         renderCollection();
@@ -370,7 +305,7 @@ function importCollection(event) {
             if (Array.isArray(imported)) {
                 tapes = imported.map((t, i) => ({ ...t, addedAt: t.addedAt || Date.now() + i }));
                 localStorage.setItem('vhsTapes', JSON.stringify(tapes));
-                editingIndex = null;
+                closeEdit();
                 renderDatalists();
                 renderFilters();
                 renderCollection();
@@ -413,7 +348,6 @@ function compressImage(file, maxWidth = 300, maxHeight = 400) {
     });
 }
 
-// ===== Год =====
 function validateYear(value) {
     const trimmed = value.trim();
     if (!trimmed) return { ok: true, value: '' };
@@ -422,20 +356,11 @@ function validateYear(value) {
     return { ok: false, value: trimmed };
 }
 
-// ===== Утилиты =====
 function escapeHtml(str) {
     if (str == null) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
-
-function escapeAttr(str) {
-    return escapeHtml(str);
-}
+function escapeAttr(str) { return escapeHtml(str); }
 
 // ===== Инициализация =====
 function init() {

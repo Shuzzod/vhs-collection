@@ -7,7 +7,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Мои VHS кассеты</h1>
+    <header class="vhs-header">
+        <div class="vhs-spine">
+            <div class="vhs-spine-label">
+                <div class="vhs-spine-title">
+                    <span>МОЯ</span>
+                    <img src="vhs-logo.svg" alt="VHS" class="vhs-logo-img">
+                    <span>КОЛЛЕКЦИЯ</span>
+                </div>
+                <div class="vhs-spine-sub">ЛИЧНЫЙ АРХИВ · КАССЕТЫ · 80-е · 90-е · 00-е</div>
+            </div>
+            <div class="vhs-spine-holes">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
 
     <div class="io-buttons">
         <button onclick="exportCollection()">Скачать коллекцию (JSON)</button>
@@ -19,15 +33,11 @@
 
     <form id="addForm">
         <input type="text" id="title" placeholder="Название" required>
-
         <input list="studiosList" id="studio" placeholder="Студия">
         <datalist id="studiosList"></datalist>
-
         <input list="localizationsList" id="localization" placeholder="Локализация">
         <datalist id="localizationsList"></datalist>
-
         <input type="text" id="year" placeholder="Год" inputmode="numeric" maxlength="10">
-
         <select id="condition">
             <option value="Запечатана">Запечатана</option>
             <option value="Отличное">Отличное</option>
@@ -35,7 +45,6 @@
             <option value="Удовлетворительное">Удовлетворительное</option>
             <option value="Плохое">Плохое</option>
         </select>
-
         <input type="file" id="cover" accept="image/*">
         <button type="submit">Добавить кассету</button>
     </form>
@@ -62,6 +71,43 @@
 
     <div id="collection"></div>
 
+    <!-- Модальное окно редактирования -->
+    <div id="editModal" class="modal-overlay" hidden>
+        <div class="modal">
+            <div class="modal-subtitle">Редактирование</div>
+            <div class="modal-title-large" style="font-size: 22px; margin-bottom: 15px;">Изменить данные</div>
+            
+            <form id="editForm" style="box-shadow: none; border: none; padding: 0; background: transparent; display: flex; flex-direction: column; gap: 10px;">
+                <input type="text" id="edit-title" placeholder="Название" required>
+                
+                <input list="editStudiosList" id="edit-studio" placeholder="Студия">
+                <datalist id="editStudiosList"></datalist>
+                
+                <input list="editLocalizationsList" id="edit-localization" placeholder="Локализация">
+                <datalist id="editLocalizationsList"></datalist>
+                
+                <input type="text" id="edit-year" placeholder="Год" inputmode="numeric">
+                
+                <select id="edit-condition">
+                    <option value="Запечатана">Запечатана</option>
+                    <option value="Отличное">Отличное</option>
+                    <option value="Хорошее">Хорошее</option>
+                    <option value="Удовлетворительное">Удовлетворительное</option>
+                    <option value="Плохое">Плохое</option>
+                </select>
+                
+                <div style="font-size: 13px; color: #5A5647; margin: 5px 0;">Обложка (оставьте пустым, чтобы не менять):</div>
+                <input type="file" id="edit-cover" accept="image/*">
+            </form>
+
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button class="modal-btn" onclick="closeEdit()">Отмена</button>
+                <button class="modal-btn primary" onclick="saveEdit()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно ошибки -->
     <div id="errorModal" class="modal-overlay" hidden>
         <div class="modal">
             <div class="modal-title">Ошибка</div>
@@ -72,6 +118,7 @@
         </div>
     </div>
 
+    <!-- Модальное окно подтверждения -->
     <div id="confirmModal" class="modal-overlay" hidden>
         <div class="modal">
             <div class="modal-subtitle">Подтверждение удаления</div>
